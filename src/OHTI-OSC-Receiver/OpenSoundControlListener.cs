@@ -23,6 +23,8 @@ namespace OHTI_OSC_Receiver
 
 		public void Connect()
 		{
+            _logger.LogInformation("Connecting OpenSoundControlListener");
+
 			// if there is already an instace dispose of it
 			if (m_Receiver != null)
 			{
@@ -48,7 +50,7 @@ namespace OHTI_OSC_Receiver
 			}
 			else if (IPAddress.TryParse(addressString, out ipAddress) == false)
 			{
-				_logger.LogInformation(String.Format("Invalid IP address, {0}", addressString));
+				_logger.LogInformation($"Invalid IP address, {addressString}");
 
 				return;
 			}
@@ -100,7 +102,7 @@ namespace OHTI_OSC_Receiver
 			{
 				while (m_Receiver != null && m_Receiver.State != OscSocketState.Closed)
 				{
-					// if we are in a state to recieve
+					// if we are in a state to receive
 					if (m_Receiver.State == OscSocketState.Connected)
 					{
 						// get the next message 
@@ -146,7 +148,7 @@ namespace OHTI_OSC_Receiver
 			{
 				// if the socket was connected when this happens
 				// then tell the user
-				if (m_Receiver.State == OscSocketState.Connected)
+				if (m_Receiver?.State == OscSocketState.Connected)
 				{
 					Console.WriteLine("Exception in listen loop");
 					Console.WriteLine(ex.Message);
