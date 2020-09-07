@@ -154,7 +154,7 @@ namespace OHTI_OSC_Receiver
 			}
 		}
 
-		void Dispose()
+		public void Dispose()
 		{
 			if (m_Receiver != null)
 			{
