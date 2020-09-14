@@ -1,4 +1,5 @@
 using System;
+using System.IO.Ports;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,6 +18,8 @@ namespace OHTI_OSC_Receiver
         private readonly IHubContext<WebsocketHub, IWebsocketHub> _websocketHub;
         private readonly OpenSoundControlListener _oscListener;
 
+        private static SerialPort _comport = new SerialPort();
+
         public Worker(ILogger<Worker> logger,
             IOptions<ApplicationSettings> configuration,
             IHubContext<WebsocketHub, IWebsocketHub> websocketHub,
@@ -32,6 +35,16 @@ namespace OHTI_OSC_Receiver
         {
 
             _oscListener.Connect();
+
+            //// Get a list of serial port names.             
+            //string[] ports = SerialPort.GetPortNames();
+            //Console.WriteLine("The following serial ports were found:");
+            //// Display each port name to the console.             
+            //foreach (string port in ports)
+            //{
+            //    Console.WriteLine(port);
+            //}
+
 
             while (!stoppingToken.IsCancellationRequested)
             {

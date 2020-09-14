@@ -5,6 +5,6 @@
         public string Name { get; set; } = "OHTI OSC Websocket Converter";
         public string ServiceName { get; set; }
         public string Hostname { get; set; }
-        public string Port { get; set; }
+        public int Port { get; set; }
     }
 }

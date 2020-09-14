@@ -1,0 +1,10 @@
+﻿<Application x:Class="OHTI_OSC_Receiver_WPF.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:OHTI_OSC_Receiver_WPF"
+             Startup="Application_Startup"
+             Exit="Application_Exit">
+    <Application.Resources>
+         
+    </Application.Resources>
+</Application>
