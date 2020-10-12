@@ -9,20 +9,18 @@
     <Grid Margin="10,10,10,10">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="464*" />
-            <ColumnDefinition Width="35*" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="56*" />
-            <RowDefinition Height="151*" />
+            <RowDefinition Height="73*" />
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" Grid.ColumnSpan="2">
-            <TextBox x:Name="InputOscIpAddress" HorizontalAlignment="Left" Margin="14,10,0,0" Text="192.168.0.1" TextWrapping="Wrap" VerticalAlignment="Top" Width="208" Height="20"/>
-            <TextBox x:Name="InputOscPort" HorizontalAlignment="Left" Margin="227,10,0,0" Text="9001" TextWrapping="Wrap" VerticalAlignment="Top" Width="60" Height="20"/>
-            <Button x:Name="ButtonSaveOscSettings" Content="Save OSC" HorizontalAlignment="Left" Margin="14,60,0,0" VerticalAlignment="Top" Height="20" Width="65"/>
-            <Button x:Name="ButtonConnectOsc" Content="Connect" HorizontalAlignment="Left" Margin="14,85,0,0" VerticalAlignment="Top" Height="20" Width="120"/>
-            <TextBox x:Name="InputOscPath" HorizontalAlignment="Left" Margin="14,35,0,0" Text="/scenerotator/quaternions" TextWrapping="Wrap" VerticalAlignment="Top" Width="273" Height="20"/>
+            <TextBox x:Name="InputOscIpAddress" HorizontalAlignment="Left" Margin="10,41,0,0" Text="239.255.255.255" TextWrapping="Wrap" VerticalAlignment="Top" Width="208" Height="20"/>
+            <TextBox x:Name="InputOscPort" HorizontalAlignment="Left" Margin="223,41,0,0" Text="9000" TextWrapping="Wrap" VerticalAlignment="Top" Width="60" Height="20" PreviewTextInput="NumberValidationTextBox" RenderTransformOrigin="0.183,0.485"/>
+            <Button x:Name="ButtonSaveOscSettings" Content="Save OSC" HorizontalAlignment="Left" Margin="10,91,0,0" VerticalAlignment="Top" Height="20" Width="65"/>
+            <Button x:Name="ButtonConnectOsc" Content="Connect" HorizontalAlignment="Left" Margin="10,123,0,0" VerticalAlignment="Top" Height="20" Width="120"/>
+            <TextBox x:Name="InputOscPath" HorizontalAlignment="Left" Margin="10,66,0,0" Text="/scenerotator/quaternions" TextWrapping="Wrap" VerticalAlignment="Top" Width="273" Height="20"/>
+            <CheckBox x:Name="CheckBoxUseUnicast" Content="Use unicast" HorizontalAlignment="Left" Margin="10,21,0,0" VerticalAlignment="Top"/>
+            <TextBox x:Name="TextConsole" HorizontalAlignment="Center" Text="&gt;" TextWrapping="Wrap" VerticalAlignment="Top" Height="248" Width="760" Margin="0,156,0,0"/>
         </Grid>
-        <TextBlock x:Name="TextConsole" HorizontalAlignment="Center" Grid.Row="1" Text="TextBlock" TextWrapping="Wrap" VerticalAlignment="Center" Height="282" Width="705"/>
-
     </Grid>
 </Window>

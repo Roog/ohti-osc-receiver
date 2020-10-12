@@ -1,12 +1,14 @@
 using System;
 using System.IO.Ports;
 using System.Net;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using OpenSoundControlBroadcastClient;
 using Rug.Osc.Core;
 
 namespace OHTI_OSC_Receiver
@@ -18,33 +20,24 @@ namespace OHTI_OSC_Receiver
         private readonly IHubContext<WebsocketHub, IWebsocketHub> _websocketHub;
         private readonly OpenSoundControlListener _oscListener;
 
-        private static SerialPort _comport = new SerialPort();
-
         public Worker(ILogger<Worker> logger,
             IOptions<ApplicationSettings> configuration,
             IHubContext<WebsocketHub, IWebsocketHub> websocketHub,
-            OpenSoundControlListener openSoundControlListener)
+            OpenSoundControlListener openSoundControlListener,
+            UDPBroadcastReceiver oscBroadcastReceiver)
         {
             _logger = logger;
             _configuration = configuration.Value;
             _websocketHub = websocketHub;
             _oscListener = openSoundControlListener;
+            oscBroadcastReceiver.StartService(new UdpClientOptions());
+
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-
+            _oscListener.SaveConfiguration("239.255.255.255", 9000);
             _oscListener.Connect();
-
-            //// Get a list of serial port names.             
-            //string[] ports = SerialPort.GetPortNames();
-            //Console.WriteLine("The following serial ports were found:");
-            //// Display each port name to the console.             
-            //foreach (string port in ports)
-            //{
-            //    Console.WriteLine(port);
-            //}
-
 
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -52,6 +45,5 @@ namespace OHTI_OSC_Receiver
                 await Task.Delay(20000, stoppingToken);
             }
         }
-
-	}
+    }
 }

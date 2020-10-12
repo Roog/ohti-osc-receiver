@@ -9,6 +9,8 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using Microsoft.Extensions.Logging;
+using OpenSoundControlClient;
 
 namespace OHTI_OSC_Receiver_WPF
 {
@@ -33,12 +35,13 @@ namespace OHTI_OSC_Receiver_WPF
 
                     services.AddSingleton<MainWindow>();
 
-                    services.AddSingleton<OpenSoundControlListener>();
+                    services.AddSingleton<UDPBroadcastReceiver>();
                 })
-                //.ConfigureLogging(logging =>
-                //{
-                //    logging.AddConsole();
-                //})
+                .ConfigureLogging(logging =>
+                {
+                    logging.AddConsole();
+                    logging.AddDebug();
+                })
                 .Build();
         }
 

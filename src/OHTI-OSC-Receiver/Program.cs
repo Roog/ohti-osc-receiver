@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OpenSoundControlBroadcastClient;
 
 namespace OHTI_OSC_Receiver
 {
@@ -21,6 +22,9 @@ namespace OHTI_OSC_Receiver
 
                     // Add the open sound control listener
                     services.AddSingleton<OpenSoundControlListener>();
+
+                    // Add the open sound control broadcast listener
+                    services.AddSingleton<UDPBroadcastReceiver>();
 
                     // Initiate background worker that keep things going
                     services.AddHostedService<Worker>();

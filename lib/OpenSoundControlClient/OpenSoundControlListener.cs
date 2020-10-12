@@ -6,88 +6,95 @@ using Rug.Osc.Core;
 
 namespace OHTI_OSC_Receiver
 {
-    public class OpenSoundControlState
-    {
-        public string Id { get; set; }
-        public IPAddress Hostname { get; set; }
-        public int Port { get; set; }
-        public bool Connected { get; set; } = false;
-
-        public void SetConfig(string address, int port)
-        {
-            if (IPAddress.TryParse(address, out IPAddress ipAddress) == true)
-            {
-                Hostname = ipAddress;
-            }
-            Port = port;
-        }
-
-        public override string ToString()
-        {
-            return $"OSC Control State {Id} {Hostname?.AddressFamily}:{Port} connected: {Connected}";
-        }
-    }
-
     public class OpenSoundControlListener : IDisposable
     {
 		private readonly ILogger<OpenSoundControlListener> _logger;
-		private static OscReceiver m_Receiver;
+        private static OpenSoundControlState _state = new OpenSoundControlState();
+        private static OscReceiver m_Receiver;
 		private static OscAddressManager m_Listener;
 		private static Thread m_Thread;
-        private static OpenSoundControlState _state = new OpenSoundControlState();
 
-		public delegate void HeadtrackingDataEventHandler(string name);
-		public event HeadtrackingDataEventHandler HeadtrackingDataEvent;
+        #region Properties
+        public OpenSoundControlState State { get { return _state; } } 
 
-        public delegate void HeadtrackingDeviceEventHandler(OpenSoundControlState state);
+		//public delegate void HeadtrackingDataEventHandler(string name);
+		//public event HeadtrackingDataEventHandler HeadtrackingDataEvent;
+
+        public delegate void HeadtrackingDeviceEventHandler(OpenSoundControlState state, string message = "");
         public event HeadtrackingDeviceEventHandler HeadtrackingDeviceEvent;
+        #endregion
 
-		public OpenSoundControlListener(ILogger<OpenSoundControlListener> logger)
+        public OpenSoundControlListener(ILogger<OpenSoundControlListener> logger)
         {
             _logger = logger;
         }
 
-		public void Connect(string addressString = "239.255.255.255", int addressPort = 9000)
-		{
-            _logger.LogInformation($"Connecting OpenSoundControlListener to '{addressString}:{addressPort}'");
-            _state.SetConfig(addressString, addressPort);
-
-			// if there is already an instace dispose of it
-			if (m_Receiver != null)
-			{
-				// dispose of the reciever
-				_logger.LogInformation("Disconnecting");
-				m_Receiver.Dispose();
-				m_Receiver = null;
-                _state.Connected = false;
-			}
-
-            IPAddress ipAddress;
-
-            // parse the ip address
-            //if (addressString.Trim().Equals("Any", StringComparison.InvariantCultureIgnoreCase) == true)
-            //{
-            //	ipAddress = IPAddress.Any;
-            //}
-            if (IPAddress.TryParse(addressString, out ipAddress) == false)
+        public bool SaveConfiguration(string addressString = "239.255.255.255", int addressPort = 9000, bool useUnicast = false)
+        {
+            if (m_Receiver?.State == OscSocketState.Connected)
             {
-                _logger.LogInformation($"Invalid IP address, {addressString}");
+                return false;
+            }
+            _state.SetConfig(addressString, addressPort, useUnicast);
+            return true;
+        }
+
+        public void Disconnect()
+        {
+            if (m_Receiver != null)
+            {
+                // dispose of the reciever
+                m_Receiver.Dispose();
+                m_Receiver = null;
+                _state.Connected = false;
+                HeadtrackingDeviceEvent?.Invoke(_state, $"Disconnecting");
+            }
+            else
+            {
+                HeadtrackingDeviceEvent?.Invoke(_state);
+            }
+        }
+
+        public void Connect()
+		{
+            _logger.LogInformation($"Connecting OpenSoundControlListener to '{_state}");
+
+            // if there is already an instace dispose of it
+            Disconnect();
+
+            // check the ip address
+            if (_state.Hostname == null)
+            {
+                _logger.LogInformation($"No hostname added");
+                HeadtrackingDeviceEvent?.Invoke(_state, $"No hostname added");
+                return;
+            }
+
+            // check the port
+            if (_state.Port == 0)
+            {
+                _logger.LogInformation($"No port added");
+                HeadtrackingDeviceEvent?.Invoke(_state, $"No port added");
                 return;
             }
 
             // create the receiver instance
-            //m_Receiver = new OscReceiver(ipAddress, (int)addressPort);
-            m_Receiver = new OscReceiver(IPAddress.Any, ipAddress, (int)addressPort);
-
+            if (_state.UseUnicast) {
+                m_Receiver = new OscReceiver((int)_state.Port);
+            } else {
+                m_Receiver = new OscReceiver(IPAddress.Any, _state.Hostname, (int)_state.Port);
+            }
+            
             // tell the user
-            _logger.LogInformation(String.Format("Listening on: {0}:{1}", addressString, (int)addressPort));
+            _logger.LogInformation($"Listening on: {_state}");
+            HeadtrackingDeviceEvent?.Invoke(_state, $"Listening");
 
-			// manager
-			m_Listener = new OscAddressManager();
+            // manager
+            m_Listener = new OscAddressManager();
+			m_Listener.Attach("/scenerotator", TestMethodA);
+            m_Listener.Attach("/scenerotator/quaternions", TestMethodA);
 
-			m_Listener.Attach("/Scenerotator", TestMethodA);
-
-			m_Thread = new Thread(new ThreadStart(ListenLoop));
+            m_Thread = new Thread(new ThreadStart(ListenLoop));
 
 			try
 			{
@@ -97,18 +104,18 @@ namespace OHTI_OSC_Receiver
 				m_Thread.Start();
 
                 _state.Connected = true;
-                HeadtrackingDeviceEvent?.Invoke(_state);
+                HeadtrackingDeviceEvent?.Invoke(_state, "Connected");
 			}
 			catch (Exception ex)
 			{
 				_logger.LogError("Exception while connecting");
 				_logger.LogError(ex.Message);
 
-				m_Receiver.Dispose();
-				m_Receiver = null;
-
                 _state.Connected = false;
-                HeadtrackingDeviceEvent?.Invoke(_state);
+                HeadtrackingDeviceEvent?.Invoke(_state, $"Error while connecting, {ex.Message}");
+
+                m_Receiver.Dispose();
+				m_Receiver = null;
 
                 return;
 			}
@@ -119,7 +126,7 @@ namespace OHTI_OSC_Receiver
 			_logger.LogInformation("Test method A called!: " + message[0].ToString());
             _logger.LogInformation("Test method A called by " + message.Origin.ToString() + ": " + message[0].ToString());
 
-            HeadtrackingDataEvent?.Invoke(message[0].ToString());
+            //HeadtrackingDataEvent?.Invoke(message[0].ToString());
         }
 
 		private void ListenLoop()
@@ -139,12 +146,14 @@ namespace OHTI_OSC_Receiver
 						{
 							// write the message to the output
 							_logger.LogInformation(packet.ToString());
-						}
+                            //HeadtrackingDataEvent?.Invoke(packet.ToString());
+                        }
 						else
 						{
 							_logger.LogError("Error reading packet, " + packet.Error);
 							_logger.LogError(packet.ErrorMessage);
-						}
+                            HeadtrackingDeviceEvent?.Invoke(_state, $"Error reading packet {packet.Error}");
+                        }
 
 						switch (m_Listener.ShouldInvoke(packet))
 						{
@@ -180,7 +189,8 @@ namespace OHTI_OSC_Receiver
 				{
                     _logger.LogError("Exception in listen loop");
                     _logger.LogError(ex.Message);
-				}
+                    HeadtrackingDeviceEvent?.Invoke(_state, $"Exception in listen loop, {ex.Message}");
+                }
 
                 _logger.LogError("Exception");
                 _logger.LogError(ex.Message);
@@ -197,7 +207,7 @@ namespace OHTI_OSC_Receiver
 			}
 
             _state.Connected = false;
-            HeadtrackingDeviceEvent?.Invoke(_state);
+            HeadtrackingDeviceEvent?.Invoke(_state, "Disposed");
         }
 	}
 }
