@@ -113,10 +113,10 @@ namespace OpenSoundControlBroadcastClient
                 {
                     Console.WriteLine("");
                     await InitiateUdpClient();
-                    //var data = Encoding.UTF8.GetBytes("ABCD");
-                    //udpClient.Send(data, data.Length, "255.255.255.255", 9000);
+                    var mess = Encoding.UTF8.GetBytes("");
+                    udpClient.Send(mess, mess.Length, "255.255.255.255", 9000);
 
-                    udpClient.Send(new byte[0], 0, "255.255.255.255", 9000);
+                    //udpClient.Send(new byte[0], 0, "255.255.255.255", 9000);
 
                     // setup first async event
                     AsyncCallback callBack = new AsyncCallback(ReceiveCallback);
@@ -126,7 +126,9 @@ namespace OpenSoundControlBroadcastClient
                 Console.WriteLine("ok");
                 //var recvBuffer = udpClient.Receive(ref from);
                 //Console.WriteLine(Encoding.UTF8.GetString(recvBuffer));
-                udpClient.Send(new byte[0], 0, "255.255.255.255", 9000);
+                //udpClient.Send(new byte[0], 0, "255.255.255.255", 9000);
+                var data = Encoding.UTF8.GetBytes("");
+                udpClient.Send(data, data.Length, "255.255.255.255", 9000);
 
                 await Task.Delay(3000, this.stoppingToken);
             }
