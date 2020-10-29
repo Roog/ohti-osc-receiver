@@ -13,12 +13,12 @@ namespace OpenSoundControlBroadcastClient
     public class UdpClientOptions
     {
         /// <summary>
-        /// ABB PLC Hostname or IP address
+        /// Server Hostname or IP address
         /// </summary>
         public string Hostname { get; set; } = "localhost";
 
         /// <summary>
-        /// ABB PLC Network port
+        /// Server Network port
         /// </summary>
         public int Port { get; set; } = 9000;
     }
@@ -41,12 +41,13 @@ namespace OpenSoundControlBroadcastClient
         {
             this.stoppingToken = new CancellationToken();
             _logger = logger;
-            Console.WriteLine("#################################### UDPBroadcastReceiver");
             from = new IPEndPoint(0, 0);
         }
 
         private async Task InitiateUdpClient()
         {
+            Console.WriteLine("Initiating UDP Client");
+
             IsClientConnected = false;
             // Initiate UDP Client
             if (udpClient != null)
@@ -54,7 +55,7 @@ namespace OpenSoundControlBroadcastClient
                 udpClient.Close();
                 udpClient = null;
             }
-            Console.WriteLine("#################################### InitiateUdpClient");
+            
             while (udpClient == null)
             {
                 try
@@ -103,6 +104,7 @@ namespace OpenSoundControlBroadcastClient
 
         public async void StartService(UdpClientOptions udpClientOptions)
         {
+            Console.WriteLine("Starting service");
             options = udpClientOptions;
 
             this.stoppingToken = new CancellationToken();
@@ -111,29 +113,22 @@ namespace OpenSoundControlBroadcastClient
             {
                 if (IsClientConnected == false)
                 {
-                    Console.WriteLine("");
+                    Console.WriteLine("Client is disconnected");
                     await InitiateUdpClient();
                     var mess = Encoding.UTF8.GetBytes("");
                     udpClient.Send(mess, mess.Length, "255.255.255.255", 9000);
-
-                    //udpClient.Send(new byte[0], 0, "255.255.255.255", 9000);
 
                     // setup first async event
                     AsyncCallback callBack = new AsyncCallback(ReceiveCallback);
                     udpClient.BeginReceive(callBack, null);
                 }
 
-                Console.WriteLine("ok");
-                //var recvBuffer = udpClient.Receive(ref from);
-                //Console.WriteLine(Encoding.UTF8.GetString(recvBuffer));
-                //udpClient.Send(new byte[0], 0, "255.255.255.255", 9000);
+                Console.WriteLine("Keep alive package sent");
                 var data = Encoding.UTF8.GetBytes("");
                 udpClient.Send(data, data.Length, "255.255.255.255", 9000);
 
                 await Task.Delay(3000, this.stoppingToken);
             }
-            
-            Console.WriteLine("####################################started service");
         }
 
         void ReceiveCallback(IAsyncResult result)
@@ -158,7 +153,7 @@ namespace OpenSoundControlBroadcastClient
                 {
                     OscMessage actual = OscMessage.Read(bytes, 0, bytes.Length);
 
-                    Console.WriteLine($"WOOP {actual}-- {actual.Address} .. {actual.Count} 00 {actual[1]}");
+                    //Console.WriteLine($"WOOP {actual}-- {actual.Address} .. {actual.Count} 00 {actual[1]}");
                     HeadtrackingDataEvent?.Invoke(actual.Address, Convert.ToSingle(actual[0]), Convert.ToSingle(actual[1]), Convert.ToSingle(actual[2]), Convert.ToSingle(actual[3]));
                 }
                 catch (Exception ex)

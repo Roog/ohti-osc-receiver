@@ -21,7 +21,6 @@ namespace OHTI_OSC_Receiver
         public Worker(ILogger<Worker> logger,
             IOptions<ApplicationSettings> configuration,
             IHubContext<WebsocketHub, IWebsocketHub> websocketHub,
-            OpenSoundControlListener openSoundControlListener,
             UDPBroadcastReceiver oscBroadcastReceiver)
         {
             _logger = logger;
@@ -40,8 +39,8 @@ namespace OHTI_OSC_Receiver
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                await Task.Delay(20000, stoppingToken);
+                _logger.LogInformation($"Worker running at: {DateTimeOffset.Now}, Current headtracking data: {_headtrackerState}");
+                await Task.Delay(10000, stoppingToken);
             }
         }
 
@@ -70,6 +69,11 @@ namespace OHTI_OSC_Receiver
             Y = y;
             Z = z;
             W = w;
+        }
+
+        public override string ToString()
+        {
+            return $"Data: {Address}, W: {W}, X: {X}, Y: {Y}, Z: {Z}";
         }
     }
 }
