@@ -23,10 +23,10 @@ namespace OpenSoundControlBroadcastClient
         public int Port { get; set; } = 9000;
     }
 
-    public class UDPBroadcastReceiver//: //INotifyPropertyChanged
+    public class UDPBroadcastReceiver: IDisposable
     {
         private readonly ILogger<UDPBroadcastReceiver> _logger;
-        protected CancellationToken stoppingToken;
+        protected CancellationTokenSource stoppingTokenSource;
 
         public bool IsClientConnected { get; set; }
         protected UdpClientOptions options;
@@ -34,12 +34,12 @@ namespace OpenSoundControlBroadcastClient
 
         private IPEndPoint from; // RemoteIpEndPoint
 
-        public delegate void HeadtrackingDataEventHandler(string address, float x, float y, float z, float theta);
+        public delegate void HeadtrackingDataEventHandler(string address, float w, float x, float y, float z);
         public event HeadtrackingDataEventHandler HeadtrackingDataEvent;
 
         public UDPBroadcastReceiver(ILogger<UDPBroadcastReceiver> logger)
         {
-            this.stoppingToken = new CancellationToken();
+            stoppingTokenSource = new CancellationTokenSource();
             _logger = logger;
             from = new IPEndPoint(0, 0);
         }
@@ -56,7 +56,7 @@ namespace OpenSoundControlBroadcastClient
                 udpClient = null;
             }
             
-            while (udpClient == null)
+            while (udpClient == null && stoppingTokenSource.Token.IsCancellationRequested == false)
             {
                 try
                 {
@@ -65,29 +65,6 @@ namespace OpenSoundControlBroadcastClient
                     udpClient.ExclusiveAddressUse = false;
                     udpClient.EnableBroadcast = true;
                     udpClient.Client.Bind(new IPEndPoint(IPAddress.Any, options.Port));
-
-
-                    //// https://darchuk.net/2019/01/04/c-setting-socket-keep-alive/
-
-
-                    //// Get the size of the uint to use to back the byte array
-                    //int size = Marshal.SizeOf((uint)0);
-
-                    //// Create the byte array
-                    //byte[] keepAlive = new byte[size * 3];
-
-                    //// Pack the byte array:
-                    //// Turn keepalive on
-                    //Buffer.BlockCopy(BitConverter.GetBytes((uint)1), 0, keepAlive, 0, size);
-                    //// Set amount of time without activity before sending a keepalive to 5 seconds
-                    //Buffer.BlockCopy(BitConverter.GetBytes((uint)5000), 0, keepAlive, size, size);
-                    //// Set keepalive interval to 5 seconds
-                    //Buffer.BlockCopy(BitConverter.GetBytes((uint)5000), 0, keepAlive, size * 2, size);
-
-                    //// Set the keep-alive settings on the underlying Socket
-                    //udpClient.Client.IOControl(IOControlCode.KeepAliveValues, keepAlive, null);
-
-
                 }
                 catch (Exception ex)
                 {
@@ -95,7 +72,7 @@ namespace OpenSoundControlBroadcastClient
                     IsClientConnected = false;
                     udpClient?.Close();
                     udpClient = null;
-                    await Task.Delay(2000, stoppingToken);
+                    await Task.Delay(2000, stoppingTokenSource.Token);
                 }
             }
 
@@ -107,9 +84,7 @@ namespace OpenSoundControlBroadcastClient
             Console.WriteLine("Starting service");
             options = udpClientOptions;
 
-            this.stoppingToken = new CancellationToken();
-            
-            while (this.stoppingToken.IsCancellationRequested == false)
+            while (stoppingTokenSource.Token.IsCancellationRequested == false)
             {
                 if (IsClientConnected == false)
                 {
@@ -127,7 +102,7 @@ namespace OpenSoundControlBroadcastClient
                 var data = Encoding.UTF8.GetBytes("");
                 udpClient.Send(data, data.Length, "255.255.255.255", 9000);
 
-                await Task.Delay(3000, this.stoppingToken);
+                await Task.Delay(3000, stoppingTokenSource.Token);
             }
         }
 
@@ -148,13 +123,10 @@ namespace OpenSoundControlBroadcastClient
             if (bytes != null && bytes.Length > 0)
             {
                 //Console.WriteLine(Encoding.UTF8.GetString(bytes));
-
                 try
                 {
                     OscMessage actual = OscMessage.Read(bytes, 0, bytes.Length);
-
-                    //Console.WriteLine($"WOOP {actual}-- {actual.Address} .. {actual.Count} 00 {actual[1]}");
-                    HeadtrackingDataEvent?.Invoke(actual.Address, Convert.ToSingle(actual[0]), Convert.ToSingle(actual[1]), Convert.ToSingle(actual[2]), Convert.ToSingle(actual[3]));
+                    HeadtrackingDataEvent?.Invoke(actual.Address, (float)actual[0], (float)actual[1], (float)actual[2], (float)actual[3]);
                 }
                 catch (Exception ex)
                 {
@@ -164,6 +136,18 @@ namespace OpenSoundControlBroadcastClient
 
             AsyncCallback callBack = new AsyncCallback(ReceiveCallback);
             udpClient.BeginReceive(callBack, null);
+        }
+
+        public void Dispose()
+        {
+            stoppingTokenSource.Cancel();
+            if (udpClient != null)
+            {
+                udpClient.Dispose();
+                udpClient = null;
+            }
+
+            IsClientConnected = false;
         }
 
         //SceneRotator/quaternions   ,ffff   = ?B>?????@<???
