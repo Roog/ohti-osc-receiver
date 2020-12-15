@@ -29,7 +29,7 @@ namespace OHTI_OSC_Receiver
             //services.Configure<KestrelServerOptions>(Configuration.GetSection("Kestrel"));
 
             // Add websockets
-            services.AddSignalR();
+            services.AddSignalR().AddMessagePackProtocol();
 
             // Add MVC controllers
             services.AddControllers();

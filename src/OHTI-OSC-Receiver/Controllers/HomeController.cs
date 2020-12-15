@@ -17,44 +17,61 @@ namespace OHTI_OSC_Receiver.Controllers
                 <html lang='en' xmlns='http://www.w3.org/1999/xhtml'>
                 <head>
                     <meta charset='utf-8' />
-                    <title>Larkspur</title>
+                    <title>Headtracking gateway</title>
                     <style type='text/css'>
+                        html {
+                            min-height: 100vh;
+                        }
                         body {
                             font-family: arial, sans-serif;
-                            font-size: 10px;
-                            background: #0089ca;
+                            font-size: 16px;
+                            background: #00caae;
                             color: #e7f5ff;
+                            margin: 0;
+                            padding: 0;
+                            min-height: 100%;
                         }
 
                         h1 {
-                            font-size: 4em;
-                            letter-spacing: -3px;
-                            text-align: center;
+                            font-size: 4rem;
+                            letter-spacing: -1px;
+                            text-align: left;
                         }
 
                         h2 {
-                            font-size: 2em;
+                            font-size: 2rem;
+                            text-align: left;
+                        }
+
+                        .container {
+                            padding: 2rem;
                         }
 
                         .row {
+                            padding: 2rem;
                             display: flex;
-                            flex-direction: row;
+                            flex-direction: column;
                         }
 
                         .data-point {
                             flex: 1 1 25%;
-                            text-align: center;
+                            text-align: left;
                         }
 
                         .data-point-text {
                             font-size: 2rem;
                             font-weight: 600;
                         }
+                        .data-point-value {
+                            color: #225851;
+                            font-size: 2rem;
+                        }
                     </style>
                 </head>
                 <body>
                     <div class='container'>
-                        <h1>Headtracking <span id='socketStatus'></span></h1>
+                        <h1>Headtracking</h1>
+                        <h2 id='socketStatus'></h1>
 
                         <div class='row'>
                             <div class='data-point'>
@@ -72,6 +89,21 @@ namespace OHTI_OSC_Receiver.Controllers
                             <div class='data-point'>
                                 <div class='data-point-text'>Z</div>
                                 <div class='data-point-value' id='data-z'></div>
+                            </div>
+                        </div>
+
+                        <div class='row'>
+                            <div class='data-point'>
+                                <div class='data-point-text'>Yaw</div>
+                                <div class='data-point-value' id='data-yaw'></div>
+                            </div>
+                            <div class='data-point'>
+                                <div class='data-point-text'>Pitch</div>
+                                <div class='data-point-value' id='data-pitch'></div>
+                            </div>
+                            <div class='data-point'>
+                                <div class='data-point-text'>Roll</div>
+                                <div class='data-point-value' id='data-roll'></div>
                             </div>
                         </div>
 
@@ -101,6 +133,19 @@ namespace OHTI_OSC_Receiver.Controllers
                             $dataX.textContent = dataX;
                             $dataY.textContent = dataY;
                             $dataZ.textContent = dataZ;
+                        });
+                    });
+
+                    var $dataYaw = document.getElementById('data-yaw');
+                    var $dataPitch = document.getElementById('data-pitch');
+                    var $dataRoll = document.getElementById('data-roll');
+
+                    connection.on('HeadtrackerEulerEvent', (path, yaw, pitch, roll) => {
+                        //console.log(path, dataW, dataX, dataY, dataZ);
+                        requestAnimationFrame(() => {
+                            $dataYaw.textContent = yaw;
+                            $dataPitch.textContent = pitch;
+                            $dataRoll.textContent = roll;
                         });
                     });
 

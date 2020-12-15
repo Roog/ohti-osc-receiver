@@ -28,5 +28,6 @@ namespace OHTI_OSC_Receiver
     {
         //Task SystemStatus(string message);
         Task HeadtrackerEvent(string address, float w, float x, float y, float z);
+        Task HeadtrackerEulerEvent(string address, float yaw, float pitch, float roll);
     }
 }

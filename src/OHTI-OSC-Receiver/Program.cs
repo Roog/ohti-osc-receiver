@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using OpenSoundControlBroadcastClient;
 
 namespace OHTI_OSC_Receiver
@@ -33,6 +34,10 @@ namespace OHTI_OSC_Receiver
                 {
                     // This one configures the web hosting
                     webBuilder.UseStartup<StartupWeb>();
+                }).ConfigureLogging(logging =>
+                {
+                    logging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Debug);
+                    logging.AddFilter("Microsoft.AspNetCore.Http.Connections", LogLevel.Debug);
                 });
     }
 }
