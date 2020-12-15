@@ -15,7 +15,7 @@ namespace OpenSoundControlBroadcastClient
         /// <summary>
         /// Server Hostname or IP address
         /// </summary>
-        public string Hostname { get; set; } = "localhost";
+        public string Hostname { get; set; } = "255.255.255.255";
 
         /// <summary>
         /// Server Network port
@@ -90,22 +90,37 @@ namespace OpenSoundControlBroadcastClient
                 {
                     Console.WriteLine("Client is disconnected");
                     await InitiateUdpClient();
-                    var mess = Encoding.UTF8.GetBytes("");
-                    udpClient.Send(mess, mess.Length, "255.255.255.255", 9000);
+                    SendHeartbeat();
 
                     // setup first async event
                     AsyncCallback callBack = new AsyncCallback(ReceiveCallback);
                     udpClient.BeginReceive(callBack, null);
                 }
 
-                Console.WriteLine("Keep alive package sent");
-                var data = Encoding.UTF8.GetBytes("");
-                udpClient.Send(data, data.Length, "255.255.255.255", 9000);
+                SendHeartbeat();
 
                 await Task.Delay(3000, stoppingTokenSource.Token);
             }
         }
 
+        void SendHeartbeat()
+        {
+            try
+            {
+                var data = Encoding.UTF8.GetBytes("");
+                udpClient.Send(data, data.Length, options.Hostname, options.Port);
+                Console.WriteLine("Keep alive package sent");
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"Could not send keep alive package because: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Receives data on this format <![CDATA[SceneRotator/quaternions   ,ffff   = ?B>?????@<???]]>
+        /// </summary>
+        /// <param name="result"></param>
         void ReceiveCallback(IAsyncResult result)
         {
             Byte[] bytes = null;
@@ -149,7 +164,5 @@ namespace OpenSoundControlBroadcastClient
 
             IsClientConnected = false;
         }
-
-        //SceneRotator/quaternions   ,ffff   = ?B>?????@<???
     }
 }
