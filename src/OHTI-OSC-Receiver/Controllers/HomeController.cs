@@ -94,16 +94,16 @@ namespace OHTI_OSC_Receiver.Controllers
 
                         <div class='row'>
                             <div class='data-point'>
-                                <div class='data-point-text'>Yaw</div>
-                                <div class='data-point-value' id='data-yaw'></div>
+                                <div class='data-point-text'>Roll</div>
+                                <div class='data-point-value' id='data-roll'></div>
                             </div>
                             <div class='data-point'>
                                 <div class='data-point-text'>Pitch</div>
                                 <div class='data-point-value' id='data-pitch'></div>
                             </div>
                             <div class='data-point'>
-                                <div class='data-point-text'>Roll</div>
-                                <div class='data-point-value' id='data-roll'></div>
+                                <div class='data-point-text'>Yaw</div>
+                                <div class='data-point-value' id='data-yaw'></div>
                             </div>
                         </div>
 

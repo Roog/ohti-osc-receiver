@@ -149,8 +149,15 @@ namespace OpenSoundControlBroadcastClient
                 }
             }
 
-            AsyncCallback callBack = new AsyncCallback(ReceiveCallback);
-            udpClient.BeginReceive(callBack, null);
+            try
+            {
+                AsyncCallback callBack = new AsyncCallback(ReceiveCallback);
+                udpClient.BeginReceive(callBack, null);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
         }
 
         public void Dispose()

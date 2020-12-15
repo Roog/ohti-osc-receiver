@@ -40,10 +40,10 @@ namespace OHTI_OSC_Receiver
             while (!stoppingToken.IsCancellationRequested)
             {
                 _logger.LogInformation($"Worker running at: {DateTimeOffset.Now}, v0.2, Current headtracking data: {_headtrackerState}");
-                float test = (float)-0.7896778;
-                float test2 = (float)0.6676576;
-                ReceivedHeadtrackingEventHandler("yeah", _headtrackerState.W, test, test2,
-                    _headtrackerState.Z);
+                //float test = (float)-0.7896778;
+                //float test2 = (float)0.6676576;
+                //ReceivedHeadtrackingEventHandler("yeah", _headtrackerState.W, test, test2,
+                //    _headtrackerState.Z);
                 await Task.Delay(10000, stoppingToken);
             }
         }
@@ -56,7 +56,7 @@ namespace OHTI_OSC_Receiver
             // Send out to the websocket
             _websocketHub.Clients.All.HeadtrackerEvent(address, w, x, y, z);
 
-            //_websocketHub.Clients.All.HeadtrackerEulerEvent(address, _headtrackerState.Yaw, _headtrackerState.Pitch, _headtrackerState.Roll);
+            _websocketHub.Clients.All.HeadtrackerEulerEvent(address, _headtrackerState.Euler[0], _headtrackerState.Euler[1], _headtrackerState.Euler[2]);
         }
     }
 
@@ -68,9 +68,11 @@ namespace OHTI_OSC_Receiver
         public float Y { get; set; }
         public float Z { get; set; }
 
-        public float Yaw { get; set; }
-        public float Pitch { get; set; }
-        public float Roll { get; set; }
+        public double Yaw { get; set; }
+        public double Pitch { get; set; }
+        public double Roll { get; set; }
+
+        public float[] Euler { get; set; } = new float[3];
 
         public void Save(string address, float w, float x, float y, float z)
         {
@@ -80,32 +82,37 @@ namespace OHTI_OSC_Receiver
             Y = y;
             Z = z;
 
-            double sqw = W * W;
-            double sqx = X * X;
-            double sqy = Y * Y;
-            double sqz = Z * Z;
-
-            Yaw = (float)Math.Atan2(2f * X * W + 2f * Y * Z, 1 - 2f * (sqz + sqw));     // Yaw = X
-            Pitch = (float)Math.Asin(2f * (X * Z - W * Y));                             // Pitch = Y
-            Roll = (float)Math.Atan2(2f * X * Y + 2f * Z * W, 1 - 2f * (sqy + sqz));      // Roll = Z
+            ToEuler();
         }
 
-        public float[] GetEuler()
+        public void ToEuler()
         {
-            float[] euler = new float[3];
-            double sqw = W * W;
-            double sqx = X * X;
-            double sqy = Y * Y;
-            double sqz = Z * Z;
+            // roll (x-axis rotation)
+            var sinr_cosp = 2 * (W * X + Y * Z);
+            var cosr_cosp = 1 - 2 * (X * X + Y * Y);
+            Roll = (Math.Atan2(sinr_cosp, cosr_cosp));
 
-            Yaw = (float)Math.Atan2(2f * X * W + 2f * Y * Z, 1 - 2f * (sqz + sqw));     // Yaw = Y
-            Pitch = (float)Math.Asin(2f * (X * Z - W * Y));                             // Pitch = X
-            Roll = (float)Math.Atan2(2f * X * Y + 2f * Z * W, 1 - 2f * (sqy + sqz));      // Roll = Z
+            // pitch (y-axis rotation)
+            var sinp = 2 * (W * Y - Z * X);
+            if (Math.Abs(sinp) >= 1) {
+                Pitch = ((Math.PI / 2) * Math.Sign(sinp)); // use 90 degrees if out of range, copysign = sinp + or - applied to Math.PI/2
+            } else {
+                Pitch = (Math.Asin(sinp));
+            }
 
-            euler[0] = Yaw;
-            euler[1] = Pitch;
-            euler[2] = Roll;
-            return euler;
+            // yaw (z-axis rotation)
+            var siny_cosp = 2 * (W * Z + X * Y);
+            var cosy_cosp = 1 - 2 * (Y * Y + Z * Z);
+            Yaw = (Math.Atan2(siny_cosp, cosy_cosp));
+
+            Euler[0] = (float)Math.Round(RadiansToDegree(Yaw) * 100) / 100;
+            Euler[1] = (float)Math.Round(RadiansToDegree(Pitch) * 100) / 100;
+            Euler[2] = (float)Math.Round(RadiansToDegree(Roll) * 100) / 100;
+        }
+
+        public double RadiansToDegree(double radian)
+        {
+            return (radian * (180 / Math.PI));
         }
 
         public override string ToString()
