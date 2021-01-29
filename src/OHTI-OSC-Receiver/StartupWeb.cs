@@ -25,9 +25,6 @@ namespace OHTI_OSC_Receiver
             // Add Cross Origin support for localhost
             services.AddCors();
 
-            // Get web server settings
-            //services.Configure<KestrelServerOptions>(Configuration.GetSection("Kestrel"));
-
             // Add websockets
             services.AddSignalR().AddMessagePackProtocol();
 
