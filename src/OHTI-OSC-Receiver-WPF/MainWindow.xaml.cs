@@ -17,7 +17,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Extensions.Options;
 using System.Text.RegularExpressions;
-using OpenSoundControlClient;
+using OpenSoundControlBroadcastClient;
 
 namespace OHTI_OSC_Receiver_WPF
 {
@@ -29,7 +29,7 @@ namespace OHTI_OSC_Receiver_WPF
         private readonly ILogger _logger;
         private IServiceProvider _serviceProvider;
         private readonly ApplicationSettings _configuration;
-        private readonly UDPBroadcastReceiver _oscListener;
+        private readonly UdpBroadcastReceiver _oscListener;
 
         public MainWindow(
             ILogger<MainWindow> logger,
@@ -42,7 +42,7 @@ namespace OHTI_OSC_Receiver_WPF
             _serviceProvider = serviceProvider;
             _configuration = options.Value;
 
-            _oscListener = _serviceProvider.GetService<UDPBroadcastReceiver>();
+            _oscListener = _serviceProvider.GetService<UdpBroadcastReceiver>();
 
             //_oscListener.HeadtrackingDeviceEvent += (OpenSoundControlState state, string error) =>
             //{
@@ -128,7 +128,8 @@ namespace OHTI_OSC_Receiver_WPF
 
         private void AddConsoleRow(string text)
         {
-            try {
+            try
+            {
                 TextConsole.Text = "> " + text; // + Environment.NewLine + TextConsole.Text;
             }
             catch(Exception ex)

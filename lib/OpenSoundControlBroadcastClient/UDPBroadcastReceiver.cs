@@ -1,8 +1,37 @@
-﻿using Microsoft.Extensions.Logging;
+﻿#region copyright
+/*
+ * Open Headtracker Initiative OSC Websocket Gateway
+ *
+ * Copyright (c) 2021 Bo-Erik Sandholm & Roger Sandholm, Stockholm, Sweden
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+#endregion copyright
+
+using Microsoft.Extensions.Logging;
 using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,45 +39,32 @@ using OscCore;
 
 namespace OpenSoundControlBroadcastClient
 {
-    public class UdpClientOptions
+    public class UdpBroadcastReceiver: IDisposable
     {
-        /// <summary>
-        /// Server Hostname or IP address
-        /// </summary>
-        public string Hostname { get; set; } = "255.255.255.255";
+        private readonly ILogger<UdpBroadcastReceiver> _logger;
 
-        /// <summary>
-        /// Server Network port
-        /// </summary>
-        public int Port { get; set; } = 9000;
-    }
-
-    public class UDPBroadcastReceiver: IDisposable
-    {
-        private readonly ILogger<UDPBroadcastReceiver> _logger;
         protected CancellationTokenSource stoppingTokenSource;
-
-        public bool IsClientConnected { get; set; }
         protected UdpClientOptions options;
         protected UdpClient udpClient;
+        private IPEndPoint remoteIpEndpoint;
 
-        private IPEndPoint from; // RemoteIpEndPoint
-
+        public bool IsClientConnected { get; set; }
         public delegate void HeadtrackingDataEventHandler(string address, float w, float x, float y, float z);
         public event HeadtrackingDataEventHandler HeadtrackingDataEvent;
 
-        public UDPBroadcastReceiver(ILogger<UDPBroadcastReceiver> logger)
+        public UdpBroadcastReceiver(ILogger<UdpBroadcastReceiver> logger)
         {
-            stoppingTokenSource = new CancellationTokenSource();
             _logger = logger;
-            from = new IPEndPoint(0, 0);
+            stoppingTokenSource = new CancellationTokenSource();
+            remoteIpEndpoint = new IPEndPoint(0, 0);
         }
 
         private async Task InitiateUdpClient()
         {
-            Console.WriteLine("Initiating UDP Client");
+            _logger.LogInformation("UdpClient initiating");
 
             IsClientConnected = false;
+
             // Initiate UDP Client
             if (udpClient != null)
             {
@@ -60,7 +76,7 @@ namespace OpenSoundControlBroadcastClient
             {
                 try
                 {
-                    Console.WriteLine($"UdpClient on {IPAddress.Any}:{options.Port}");
+                    _logger.LogInformation($"UdpClient on {IPAddress.Any}:{options.Port}");
                     udpClient = new UdpClient();
                     udpClient.ExclusiveAddressUse = false;
                     udpClient.EnableBroadcast = true;
@@ -68,7 +84,7 @@ namespace OpenSoundControlBroadcastClient
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Could not connect {ex.Message}");
+                    _logger.LogWarning($"UdpClient could not connect {ex.Message}");
                     IsClientConnected = false;
                     udpClient?.Close();
                     udpClient = null;
@@ -81,18 +97,18 @@ namespace OpenSoundControlBroadcastClient
 
         public async void StartService(UdpClientOptions udpClientOptions)
         {
-            Console.WriteLine("Starting service");
+            _logger.LogInformation("UdpClient starting service");
             options = udpClientOptions;
 
             while (stoppingTokenSource.Token.IsCancellationRequested == false)
             {
                 if (IsClientConnected == false)
                 {
-                    Console.WriteLine("Client is disconnected");
+                    _logger.LogWarning("UdpClient is disconnected");
                     await InitiateUdpClient();
                     SendHeartbeat();
 
-                    // setup first async event
+                    // Setup first async event
                     AsyncCallback callBack = new AsyncCallback(ReceiveCallback);
                     udpClient.BeginReceive(callBack, null);
                 }
@@ -109,11 +125,11 @@ namespace OpenSoundControlBroadcastClient
             {
                 var data = Encoding.UTF8.GetBytes("");
                 udpClient.Send(data, data.Length, options.Hostname, options.Port);
-                Console.WriteLine("Keep alive package sent");
+                _logger.LogDebug("UdpClient keep alive package sent");
             }
             catch(Exception ex)
             {
-                Console.WriteLine($"Could not send keep alive package because: {ex.Message}");
+                _logger.LogWarning($"UdpClient could not send keep alive package because: {ex.Message}");
             }
         }
 
@@ -123,11 +139,11 @@ namespace OpenSoundControlBroadcastClient
         /// <param name="result"></param>
         void ReceiveCallback(IAsyncResult result)
         {
-            Byte[] bytes = null;
+            byte[] bytes = null;
 
             try
             {
-                bytes = udpClient.EndReceive(result, ref from);
+                bytes = udpClient.EndReceive(result, ref remoteIpEndpoint);
             }
             catch (ObjectDisposedException e)
             {
@@ -137,7 +153,7 @@ namespace OpenSoundControlBroadcastClient
             // Process bytes
             if (bytes != null && bytes.Length > 0)
             {
-                //Console.WriteLine(Encoding.UTF8.GetString(bytes));
+                //_logger.LogInformation(Encoding.UTF8.GetString(bytes));
                 try
                 {
                     OscMessage actual = OscMessage.Read(bytes, 0, bytes.Length);
@@ -145,7 +161,7 @@ namespace OpenSoundControlBroadcastClient
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error parsing message {ex.Message}");
+                    _logger.LogError($"UdpClient error parsing message {ex.Message}");
                 }
             }
 
@@ -156,7 +172,7 @@ namespace OpenSoundControlBroadcastClient
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error: {ex.Message}");
+                _logger.LogError($"UdpClient error: {ex.Message}");
             }
         }
 

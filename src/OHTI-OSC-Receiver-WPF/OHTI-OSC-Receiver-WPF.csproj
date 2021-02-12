@@ -30,6 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\lib\OpenSoundControlBroadcastClient\OpenSoundControlBroadcastClient.csproj" />
     <ProjectReference Include="..\..\lib\OpenSoundControlClient\OpenSoundControlClient.csproj" />
   </ItemGroup>
 
