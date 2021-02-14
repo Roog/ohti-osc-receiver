@@ -89,20 +89,17 @@ namespace OHTI_OSC_Receiver.Controllers
                             text-align: left;
                         }
                         .data-point-text {
-                            font-size: 2rem;
-                            font-weight: 600;
-                            flex: 0 1 25%;
+                            font-size: 1.6rem;
+                            font-weight: 200;
+                            flex: 0 1 35%;
                             text-align: right;
                             padding-right: 1rem;
-                            max-width: 12rem;
+                            max-width: 18rem;
                         }
                         .data-point-value {
                             color: #225851;
-                            font-size: 2rem;
-                        }
-                        .data-point-settings {
-                            font-size: 2rem;
-                            font-weight: 200;
+                            font-size: 1.6rem;
+                            align-self: center;
                         }
                     </style>
                 </head>
@@ -151,6 +148,14 @@ namespace OHTI_OSC_Receiver.Controllers
                                 <div class='data-point-text'>Device</div>
                                 <div class='data-point-value' id='data-setting-device'></div>
                             </div>
+                            <div class='data-point'>
+                                <div class='data-point-text'>Listening</div>
+                                <div class='data-point-value' id='data-setting-is-listening'></div>
+                            </div>
+                            <div class='data-point'>
+                                <div class='data-point-text'>Received data</div>
+                                <div class='data-point-value' id='data-setting-last-received'></div>
+                            </div>
                         </div>
                     </div>
 
@@ -195,13 +200,23 @@ namespace OHTI_OSC_Receiver.Controllers
                     });
 
                     var $dataSettingDevice = document.getElementById('data-setting-device');
-
                     connection.on('ApplicationSettings', (settings) => {
                         console.log('Settings: ', settings);
-                        if(!$dataSettingDevice) {
+                        if (!$dataSettingDevice) {
                             return;
                         }
                         $dataSettingDevice.textContent = `${settings.receiver.hostname}:${settings.receiver.port}`;
+                    });
+
+                    var $dataSettingIsListening = document.getElementById('data-setting-is-listening');
+                    var $dataSettingLastReceived = document.getElementById('data-setting-last-received');
+                    connection.on('ApplicationState', (state) => {
+                        console.log('State: ', state);
+                        if (!$dataSettingIsListening || !$dataSettingLastReceived) {
+                            return;
+                        }
+                        $dataSettingIsListening.textContent = state.receiverIsConnected ? `Yes` : `No`;
+                        $dataSettingLastReceived.textContent = `${state.lastReceivedData}`;
                     });
 
                     connection.start()
@@ -213,16 +228,19 @@ namespace OHTI_OSC_Receiver.Controllers
                         })
                         .catch(function (err) {
                             setSocketConnectionFeedback(`Gateway connection error ${err.toString()}`);
+                            $dataSettingIsListening.textContent = `Unknown`;
                             return console.error(err.toString());
                         });
 
                     connection.onclose(function() {
                         console.log('connection onclose');
+                        $dataSettingIsListening.textContent = `Unknown`;
                         setSocketConnectionFeedback(`Gateway ${connection.connectionState.toLowerCase()} `);
                     });
 
                     connection.onreconnecting(function(error) {
                         console.log('connection onreconnecting', error);
+                        $dataSettingIsListening.textContent = `Unknown`;
                         setSocketConnectionFeedback(`Problems with connection to gateway ${connection.connectionState.toLowerCase()} `);
                     });
 

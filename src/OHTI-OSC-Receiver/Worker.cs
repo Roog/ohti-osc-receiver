@@ -42,11 +42,14 @@ namespace OHTI_OSC_Receiver
 {
     public class Worker : BackgroundService
     {
+        public static Worker SingleInstance { get; private set; }
+
         private readonly ILogger<Worker> _logger;
         private readonly ApplicationSettings _configuration;
         private readonly IHubContext<WebsocketHub, IWebsocketHub> _websocketHub;
         private readonly UdpBroadcastReceiver _oscUdpBroadcastReceiver;
-        private readonly HeadtrackerFormat _headtrackerState = new HeadtrackerFormat();
+        private readonly HeadtrackerFormat _headtrackerData = new HeadtrackerFormat();
+        private readonly HeadtrackerClientState _headtrackerClientState = new HeadtrackerClientState();
 
         public Worker(
             ILogger<Worker> logger,
@@ -62,6 +65,8 @@ namespace OHTI_OSC_Receiver
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            SingleInstance = this;
+
             // Initiate service
             _oscUdpBroadcastReceiver.StartService(new UdpClientOptions
             {
@@ -71,23 +76,42 @@ namespace OHTI_OSC_Receiver
 
             // Set-up listeners
             _oscUdpBroadcastReceiver.HeadtrackingDataEvent += ReceivedHeadtrackingEventHandler;
+            _oscUdpBroadcastReceiver.UdpClientConnectedEvent += ReceivedUdpClientConnectedEventHandler;
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                _logger.LogInformation($"Worker running at: {DateTimeOffset.Now}, current headtracking data: {_headtrackerState}");
-                await Task.Delay(10000, stoppingToken);
+                _logger.LogInformation($"Worker running at: {DateTimeOffset.Now}, current headtracking data: {_headtrackerData}");
+                SendApplicationStateAsync();
+                await Task.Delay(2000, stoppingToken);
             }
+        }
+
+        public async Task SendApplicationStateAsync()
+        {
+            _headtrackerClientState.ReceiverIsConnected = _oscUdpBroadcastReceiver.IsClientConnected;
+
+            await _websocketHub.Clients.All.ApplicationState(_headtrackerClientState);
+        }
+
+        private void ReceivedUdpClientConnectedEventHandler(bool isConnected)
+        {
+            // Store some application state
+            _headtrackerClientState.ReceiverIsConnected = isConnected;
+            _websocketHub.Clients.All.ApplicationState(_headtrackerClientState);
         }
 
         private void ReceivedHeadtrackingEventHandler(string address, float w, float x, float y, float z)
         {
             // Store a local copy
-            _headtrackerState.Save(address, w, x, y, z);
+            _headtrackerData.Save(address, w, x, y, z);
+
+            // Store some application state
+            _headtrackerClientState.LastReceivedData = new DateTime();
 
             // Send out to the websocket
             _websocketHub.Clients.All.HeadtrackerEvent(address, w, x, y, z);
 
-            _websocketHub.Clients.All.HeadtrackerEulerEvent(address, _headtrackerState.Euler[0], _headtrackerState.Euler[1], _headtrackerState.Euler[2]);
+            _websocketHub.Clients.All.HeadtrackerEulerEvent(address, _headtrackerData.Euler[0], _headtrackerData.Euler[1], _headtrackerData.Euler[2]);
         }
     }
 }

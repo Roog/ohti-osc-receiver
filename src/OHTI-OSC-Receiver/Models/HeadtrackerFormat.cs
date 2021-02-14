@@ -61,12 +61,12 @@ namespace OHTI_OSC_Receiver.Models
             ToEuler();
         }
 
-        public void ToEuler()
+        private void ToEuler()
         {
             // roll (x-axis rotation)
-            var sinr_cosp = 2 * (W * X + Y * Z);
-            var cosr_cosp = 1 - 2 * (X * X + Y * Y);
-            Roll = (Math.Atan2(sinr_cosp, cosr_cosp));
+            var sinrCosp = 2 * (W * X + Y * Z);
+            var cosrCosp = 1 - 2 * (X * X + Y * Y);
+            Roll = (Math.Atan2(sinrCosp, cosrCosp));
 
             // pitch (y-axis rotation)
             var sinp = 2 * (W * Y - Z * X);

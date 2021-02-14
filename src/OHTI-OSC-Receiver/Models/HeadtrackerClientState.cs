@@ -1,4 +1,4 @@
-﻿#region copyright
+#region copyright
 /*
  * Open Headtracker Initiative OSC Websocket Gateway
  *
@@ -29,40 +29,12 @@
 #endregion copyright
 
 using System;
-using Microsoft.AspNetCore.SignalR;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
 
 namespace OHTI_OSC_Receiver
 {
-    public class WebsocketHub : Hub<IWebsocketHub>
+    public class HeadtrackerClientState
     {
-        private static Worker worker => Worker.SingleInstance;
-        private readonly ApplicationSettings _configuration;
-
-        public WebsocketHub(IOptions<ApplicationSettings> configuration)
-        {
-            _configuration = configuration.Value;
-        }
-
-        public override async Task OnConnectedAsync()
-        {
-            await Clients.All.ApplicationSettings(_configuration);
-
-            worker.SendApplicationStateAsync();
-        }
-
-        public override Task OnDisconnectedAsync(Exception exception)
-        {
-            return Task.CompletedTask;
-        }
-    }
-
-    public interface IWebsocketHub
-    {
-        Task ApplicationSettings(ApplicationSettings settings);
-        Task ApplicationState(HeadtrackerClientState state);
-        Task HeadtrackerEvent(string address, float w, float x, float y, float z);
-        Task HeadtrackerEulerEvent(string address, float yaw, float pitch, float roll);
+        public DateTime LastReceivedData { get; set; }
+        public bool ReceiverIsConnected { get; set; }
     }
 }

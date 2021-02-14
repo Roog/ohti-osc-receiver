@@ -48,9 +48,22 @@ namespace OpenSoundControlBroadcastClient
         protected UdpClient udpClient;
         private IPEndPoint remoteIpEndpoint;
 
-        public bool IsClientConnected { get; set; }
+        private bool _connected;
+        public bool IsClientConnected
+        {
+            get => _connected;
+            private set
+            {
+                _connected = value;
+                UdpClientConnectedEvent?.Invoke(value);
+            }
+        }
+
         public delegate void HeadtrackingDataEventHandler(string address, float w, float x, float y, float z);
         public event HeadtrackingDataEventHandler HeadtrackingDataEvent;
+
+        public delegate void UdpClientConnectionEventHandler(bool isConnected);
+        public event UdpClientConnectionEventHandler UdpClientConnectedEvent;
 
         public UdpBroadcastReceiver(ILogger<UdpBroadcastReceiver> logger)
         {
