@@ -40,5 +40,6 @@ namespace OHTI_OSC_Receiver
     {
         public string Hostname { get; set; } = "255.255.255.255";
         public int Port { get; set; } = 9000;
+        public string OscAddress { get; set; } = "/SceneRotator/quaternions";
     }
 }

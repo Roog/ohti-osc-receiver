@@ -106,7 +106,7 @@ namespace OHTI_OSC_Receiver
             _headtrackerData.Save(address, w, x, y, z);
 
             // Store some application state
-            _headtrackerClientState.LastReceivedData = new DateTime();
+            _headtrackerClientState.LastReceivedData = DateTime.Now;
 
             // Send out to the websocket
             _websocketHub.Clients.All.HeadtrackerEvent(address, w, x, y, z);

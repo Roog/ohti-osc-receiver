@@ -46,7 +46,7 @@ namespace OHTI_OSC_Receiver.Models
 
         public float[] Euler { get; set; } = new float[3];
 
-        public DateTime UpdatedTime { get; set; } = new DateTime();
+        public DateTime UpdatedTime { get; set; } = DateTime.Now;
 
         public void Save(string address, float w, float x, float y, float z)
         {
@@ -56,7 +56,7 @@ namespace OHTI_OSC_Receiver.Models
             Y = y;
             Z = z;
 
-            UpdatedTime = new DateTime();
+            UpdatedTime = DateTime.Now;
 
             ToEuler();
         }

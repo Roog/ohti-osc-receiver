@@ -63,30 +63,41 @@ namespace OHTI_OSC_Receiver.Controllers
                             min-height: 100%;
                         }
                         h1 {
-                            font-size: 3rem;
+                            font-size: 2.6rem;
                             letter-spacing: -1px;
                             text-align: left;
                             font-weight: 200;
                             word-break: break-all;
+                            margin: 0.2rem 0;
                         }
                         h2 {
-                            font-size: 2rem;
+                            font-size: 1.8rem;
                             text-align: left;
                             font-weight: 200;
                             word-break: break-all;
                             color: #95fff0;
+                            margin: 0.2rem 0;
+                        }
+                        h3 {
+                            font-size: 1.4rem;
+                            text-align: left;
+                            font-weight: 200;
+                            word-break: break-all;
+                            color: #582222;
+                            margin: 0.2rem 0;
                         }
                         .container {
                             padding: 2rem;
                         }
                         .row {
-                            padding: 2rem;
+                            padding: 0.8rem 2rem;
                             display: flex;
                             flex-direction: column;
                         }
                         .data-point {
                             display: flex;
                             text-align: left;
+                            padding: 0.2rem 0;
                         }
                         .data-point-text {
                             font-size: 1.6rem;
@@ -100,13 +111,23 @@ namespace OHTI_OSC_Receiver.Controllers
                             color: #225851;
                             font-size: 1.6rem;
                             align-self: center;
+                            word-break: break-all;
+                        }
+                        .circuit-board {
+                            position: fixed;
+                            z-index: -1;
+                            right: 0;
+                            bottom: -6vw;
+                            width: 30vw;
+                            height: 30vw;
+                            pointer-events: none;
                         }
                     </style>
                 </head>
                 <body>
                     <div class='container'>
                         <h1>Headtracking</h1>
-                        <h2 id='socketStatus'></h1>
+                        <h2 id='socketStatus'></h2>
 
                         <div class='row'>
                             <div class='data-point'>
@@ -153,9 +174,49 @@ namespace OHTI_OSC_Receiver.Controllers
                                 <div class='data-point-value' id='data-setting-is-listening'></div>
                             </div>
                             <div class='data-point'>
-                                <div class='data-point-text'>Received data</div>
-                                <div class='data-point-value' id='data-setting-last-received'></div>
+                                <div class='data-point-text'>Receiving</div>
+                                <div class='data-point-value' id='data-setting-is-receiving'></div>
                             </div>
+                            <div class='data-point'>
+                                <div class='data-point-text'>OSC Address</div>
+                                <div class='data-point-value' id='data-setting-osc-address'></div>
+                            </div>
+                        </div>
+
+                        <h3 id='errorStatus'></h3>
+
+                        <div class='circuit-board'>
+                            <svg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 140 140' enable-background='new 0 0 140 140' xml:space='preserve'>
+	                            <g>
+		                            <path fill='#DD6460' d='M80.6,128.7L11.3,59.4c-2.3-2.3-2.3-6.1,0-8.5l39.6-39.6c2.3-2.3,6.1-2.3,8.5,0l69.3,69.3c2.3,2.3,2.3,6.1,0,8.5l-39.6,39.6C86.7,131,82.9,131,80.6,128.7z'/>
+		                            <circle fill='#DD9B62' cx='120.2' cy='84.8' r='7'/>
+		                            <circle fill='#DB7478' cx='120.2' cy='84.8' r='4.4'/>
+		                            <circle fill='#DD9B62' cx='19.8' cy='55.2' r='7'/>
+		                            <circle fill='#DB7478' cx='19.8' cy='55.2' r='4.4'/>
+		                            <polyline fill='none' stroke='#DF6D6A' stroke-width='4' stroke-linecap='round' stroke-linejoin='round' stroke-miterlimit='10' points='71.3,43.3 71.4,30.4 58.4,17.4 50.6,25.1'/>
+		                            <polyline fill='none' stroke='#DF6D6A' stroke-width='4' stroke-linecap='round' stroke-linejoin='round' stroke-miterlimit='10' points='86.9,118 81.9,122.9 57.6,98 57.3,82.2'/>
+		                            <line fill='none' stroke='#DF6D6A' stroke-width='4' stroke-linecap='round' stroke-linejoin='round' stroke-miterlimit='10' x1='97' y1='107.6' x2='98.7' y2='88.1'/>
+		                            <g>
+			                            <path fill='#DD9B62' d='M86.3,52.3c1.1,0,2-0.9,2-2v0c0-1.1-0.9-2-2-2h-6v-6c0-1.1-0.9-2-2-2c-1.1,0-2,0.9-2,2v6h-3v-6c0-1.1-0.9-2-2-2s-2,0.9-2,2v6h-3v-6c0-1.1-0.9-2-2-2s-2,0.9-2,2v6h-3v-6c0-1.1-0.9-2-2-2s-2,0.9-2,2v6h-3v-6c0-1.1-0.9-2-2-2c-1.1,0-2,0.9-2,2v6h-6c-1.1,0-2,0.9-2,2v0c0,1.1,0.9,2,2,2h6v3h-6c-1.1,0-2,0.9-2,2c0,1.1,0.9,2,2,2h6v3h-6c-1.1,0-2,0.9-2,2c0,1.1,0.9,2,2,2h6v3h-6c-1.1,0-2,0.9-2,2s0.9,2,2,2h6v3h-6c-1.1,0-2,0.9-2,2s0.9,2,2,2h6v6c0,1.1,0.9,2,2,2c1.1,0,2-0.9,2-2v-6h3v6c0,1.1,0.9,2,2,2s2-0.9,2-2v-6h3v6c0,1.1,0.9,2,2,2s2-0.9,2-2v-6h3v6c0,1.1,0.9,2,2,2s2-0.9,2-2v-6h3v6c0,1.1,0.9,2,2,2c1.1,0,2-0.9,2-2v-6h6c1.1,0,2-0.9,2-2s-0.9-2-2-2h-6v-3h6c1.1,0,2-0.9,2-2s-0.9-2-2-2h-6v-3h6c1.1,0,2-0.9,2-2c0-1.1-0.9-2-2-2h-6v-3h6c1.1,0,2-0.9,2-2c0-1.1-0.9-2-2-2h-6v-3H86.3z'/>
+			                            <path fill='#DE7F82' d='M82.3,84.3h-36c-1.1,0-2-0.9-2-2v-36c0-1.1,0.9-2,2-2h36c1.1,0,2,0.9,2,2v36C84.3,83.4,83.4,84.3,82.3,84.3z'/>
+			                            <path fill='#E0888B' d='M61.3,64.3h-11c-0.6,0-1-0.4-1-1v-3c0-0.6,0.4-1,1-1h11c0.6,0,1,0.4,1,1v3C62.3,63.9,61.9,64.3,61.3,64.3z'/>
+			                            <path fill='#E0888B' d='M66.3,54.3h-16c-0.6,0-1-0.4-1-1v-3c0-0.6,0.4-1,1-1h16c0.6,0,1,0.4,1,1v3C67.3,53.9,66.9,54.3,66.3,54.3z'/>
+		                            </g>
+		                            <g>
+			                            <path fill='#DD9B62' d='M39.6,36.1L39.6,36.1c-0.8-0.8-0.8-2,0-2.8l12.7-12.7c0.8-0.8,2-0.8,2.8,0l0,0c0.8,0.8,0.8,2,0,2.8L42.5,36.1C41.7,36.9,40.4,36.9,39.6,36.1z'/>
+			                            <path fill='#F0BCBB' d='M47,37.8L34.3,25.1c-0.8-0.8-0.8-2,0-2.8l7.1-7.1c0.8-0.8,2-0.8,2.8,0l12.7,12.7c0.8,0.8,0.8,2,0,2.8l-7.1,7.1C49.1,38.6,47.8,38.6,47,37.8z'/>
+			                            <path fill='#FFE1E1' d='M46.9,34.1L44.7,32c-0.4-0.4-0.4-1,0-1.4l4.9-4.9c0.4-0.4,1-0.4,1.4,0l2.1,2.1c0.4,0.4,0.4,1,0,1.4l-4.9,4.9C47.9,34.5,47.2,34.5,46.9,34.1z'/>
+		                            </g>
+		                            <g>
+			                            <path fill='#DD9B62' d='M85.3,119.3L85.3,119.3c-0.8-0.8-0.8-2,0-2.8l10.6-10.6c0.8-0.8,2-0.8,2.8,0h0c0.8,0.8,0.8,2,0,2.8l-10.6,10.6C87.4,120.1,86.1,120.1,85.3,119.3z'/>
+			                            <path fill='#DE7F82' d='M89.8,118.1l-3.3-3.3c-0.8-0.8-0.8-2,0-2.8l4.9-4.9c0.8-0.8,2-0.8,2.8,0l3.3,3.3c0.8,0.8,0.8,2,0,2.8l-4.9,4.9C91.9,118.9,90.6,118.9,89.8,118.1z'/>
+		                            </g>
+		                            <g>
+			                            <circle fill='#DD9A60' cx='98.7' cy='88.1' r='8.5'/>
+			                            <circle fill='#EA7878' cx='98.7' cy='88.1' r='4.5'/>
+		                            </g>
+	                            </g>
+                            </svg>
                         </div>
                     </div>
 
@@ -169,92 +230,116 @@ namespace OHTI_OSC_Receiver.Controllers
                         .withAutomaticReconnect()
                         .build();
 
-                    setSocketConnectionFeedback(`Gateway disconnected `);
+                    setSocketConnectionFeedback(`Gateway disconnected`);
 
                     var $dataW = document.getElementById('data-w');
                     var $dataX = document.getElementById('data-x');
                     var $dataY = document.getElementById('data-y');
                     var $dataZ = document.getElementById('data-z');
-
+                    var currentOscPath = '';
                     connection.on('HeadtrackerEvent', (path, dataW, dataX, dataY, dataZ) => {
                         //console.log(path, dataW, dataX, dataY, dataZ);
+                        currentOscPath = path;
+
                         requestAnimationFrame(() => {
-                            $dataW.textContent = dataW;
-                            $dataX.textContent = dataX;
-                            $dataY.textContent = dataY;
-                            $dataZ.textContent = dataZ;
+                            $dataW.textContent = dataW > 0 ? `+${dataW}` : dataW;
+                            $dataX.textContent = dataX > 0 ? `+${dataX}` : dataX;
+                            $dataY.textContent = dataY > 0 ? `+${dataY}` : dataY;
+                            $dataZ.textContent = dataZ > 0 ? `+${dataZ}` : dataZ;
                         });
                     });
 
                     var $dataYaw = document.getElementById('data-yaw');
                     var $dataPitch = document.getElementById('data-pitch');
                     var $dataRoll = document.getElementById('data-roll');
-
                     connection.on('HeadtrackerEulerEvent', (path, yaw, pitch, roll) => {
                         //console.log(path, dataW, dataX, dataY, dataZ);
                         requestAnimationFrame(() => {
-                            $dataYaw.textContent = yaw;
-                            $dataPitch.textContent = pitch;
-                            $dataRoll.textContent = roll;
+                            $dataYaw.textContent = yaw > 0 ? `+${yaw}` : yaw;
+                            $dataPitch.textContent = pitch > 0 ? `+${pitch}` : pitch;
+                            $dataRoll.textContent = roll > 0 ? `+${roll}` : roll;
                         });
                     });
 
                     var $dataSettingDevice = document.getElementById('data-setting-device');
+                    var $dataSettingOscAddress = document.getElementById('data-setting-osc-address');
+                    var applicationSettings = null;
                     connection.on('ApplicationSettings', (settings) => {
                         console.log('Settings: ', settings);
+                        applicationSettings = settings;
                         if (!$dataSettingDevice) {
                             return;
                         }
                         $dataSettingDevice.textContent = `${settings.receiver.hostname}:${settings.receiver.port}`;
+                        $dataSettingOscAddress.textContent = `${settings.receiver.oscAddress}`;
                     });
 
                     var $dataSettingIsListening = document.getElementById('data-setting-is-listening');
-                    var $dataSettingLastReceived = document.getElementById('data-setting-last-received');
+                    var $dataSettingIsReceiving = document.getElementById('data-setting-is-receiving');
+                    var $errorStatus = document.getElementById('errorStatus');
+                    var lastReceivedData = new Date();
                     connection.on('ApplicationState', (state) => {
-                        console.log('State: ', state);
-                        if (!$dataSettingIsListening || !$dataSettingLastReceived) {
-                            return;
-                        }
                         $dataSettingIsListening.textContent = state.receiverIsConnected ? `Yes` : `No`;
-                        $dataSettingLastReceived.textContent = `${state.lastReceivedData}`;
+
+                        if (lastReceivedData.getTime() >= (new Date(state.lastReceivedData).getTime())) {
+                            $dataSettingIsReceiving.textContent = `No, last ${formatDateTime(state.lastReceivedData)}`;
+                        } else {
+                            $dataSettingIsReceiving.textContent = `Yes`;
+                        }
+                        lastReceivedData = new Date(state.lastReceivedData);
+
+                        if (applicationSettings.receiver.oscAddress != currentOscPath) {
+                            $errorStatus.textContent = `Missmatch in receiving osc address '${currentOscPath}' with configured.`;
+                        } else {
+                            $errorStatus.textContent = ``;
+                        }
                     });
 
                     connection.start()
                         .then(function () {
                             setSocketConnectionFeedback(`Gateway ${connection.connectionState.toLowerCase()} `);
-                            //connection.invoke('RequestInitialState').catch((err) => {
-                            //    return console.error('Could not request initial state', err);
-                            //});
                         })
                         .catch(function (err) {
                             setSocketConnectionFeedback(`Gateway connection error ${err.toString()}`);
                             $dataSettingIsListening.textContent = `Unknown`;
+                            $dataSettingIsReceiving.textContent = `Unknown`;
                             return console.error(err.toString());
                         });
 
                     connection.onclose(function() {
                         console.log('connection onclose');
                         $dataSettingIsListening.textContent = `Unknown`;
+                        $dataSettingIsReceiving.textContent = `Unknown`;
                         setSocketConnectionFeedback(`Gateway ${connection.connectionState.toLowerCase()} `);
                     });
 
                     connection.onreconnecting(function(error) {
                         console.log('connection onreconnecting', error);
                         $dataSettingIsListening.textContent = `Unknown`;
+                        $dataSettingIsReceiving.textContent = `Unknown`;
                         setSocketConnectionFeedback(`Problems with connection to gateway ${connection.connectionState.toLowerCase()} `);
                     });
 
                     connection.onreconnected(function() {
                         console.log('connection onreconnected');
                         setSocketConnectionFeedback(`Gateway connection ${connection.connectionState.toLowerCase()} `);
-
-                        //connection.invoke('RequestInitialState').catch((err) => {
-                        //    return console.error('Could not request initial state', err);
-                        //});
                     });
 
                     function setSocketConnectionFeedback(message) {
                         document.getElementById('socketStatus').textContent = message;
+                    }
+
+                    function formatDateTime(incoming) {
+                        let date = new Date(incoming);
+                        let dd = (date.getDate() < 10 ? '0' : '') + date.getDate();
+                        let MM = ((date.getMonth() + 1) < 10 ? '0' : '') + (date.getMonth() + 1);
+                        let yyyy = date.getFullYear();
+
+                        let hours = (date.getHours() < 10 ? '0' : '') + date.getHours();
+                        let minutes = (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
+                        let seconds = (date.getSeconds() < 10 ? '0' : '') + date.getSeconds();
+
+                        return (`${yyyy}-${MM}-${dd} ${hours}:${minutes}:${seconds}`);
                     }
 
                     </script>
