@@ -20,4 +20,12 @@
     <ProjectReference Include="..\..\lib\OpenSoundControlBroadcastClient\OpenSoundControlBroadcastClient.csproj" />
     <ProjectReference Include="..\..\lib\OpenSoundControlClient\OpenSoundControlClient.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+  </ItemGroup>
 </Project>

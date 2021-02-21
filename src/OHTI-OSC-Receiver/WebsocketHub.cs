@@ -29,7 +29,6 @@
 #endregion copyright
 
 using System;
-using System.Diagnostics;
 using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
