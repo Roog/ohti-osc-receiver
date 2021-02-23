@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang='en' xmlns='http://www.w3.org/1999/xhtml'>
+<head>
+    <meta charset='utf-8' />
+    <title>Headtracking gateway</title>
+    <style type='text/css'>
+        @import url('https://fonts.googleapis.com/css2?family=Rubik+Mono+One&family=Rubik:wght@500&display=swap');
+
+        html {
+            min-height: 100vh;
+        }
+        body {
+            font-family: 'Rubik Mono One', Arial, sans-serif;
+            font-size: 16px;
+            font-weight: 200;
+            background: #0045ca;
+            background: linear-gradient(to bottom, #0f1727 0%, #1d18a2 100%);
+            color: #e7f5ff;
+            margin: 0;
+            padding: 0;
+            min-height: 100%;
+        }
+        h1 {
+            font-size: 2.8rem;
+            letter-spacing: -1px;
+            text-align: left;
+            font-weight: 200;
+            word-break: break-all;
+            margin: 2.2rem 1.2rem 1rem 1.2rem;
+            text-shadow: 3px 3px 9px #013292;
+        }
+        h2 {
+            font-size: 1.8rem;
+            text-align: left;
+            font-weight: 200;
+            word-break: break-all;
+            color: #95fff0;
+            margin: 2.2rem 1.2rem 1rem 1.2rem;
+            text-shadow: 2px 2px 4px #015392;
+        }
+        h3 {
+            font-size: 1.4rem;
+            text-align: left;
+            font-weight: 200;
+            word-break: break-all;
+            color: #582222;
+            margin: 0.2rem 0;
+        }
+        a {
+            color: #98a4ff;
+        }
+        pre {
+            overflow-x: auto;
+        }
+        .row#download {
+            text-align: center;
+            padding: 0.8rem 0.2rem;
+            font-family: 'Rubik', Arial, sans-serif;
+            line-height: 1.8rem;
+            overflow-wrap: break-word;
+        }
+        .release-title {
+            padding: 1rem 0.2rem;
+        }
+        .download-link {
+            appearance: none;
+            padding: 0.55rem 1.5rem;
+            line-height: 1;
+            border-radius: 2rem;
+            border: 0.15rem solid #00308e;
+            background: linear-gradient(15deg, #1e1e90, #35429e, #24349a);
+            color: #cfdfff;
+            font-family: 'Rubik', Arial, sans-serif;
+            font-size: 1rem;
+            margin: 0.2rem auto;
+            white-space: nowrap;
+            display: inline-block;
+        }
+        .download-link:hover, .download-link:active {
+            background: linear-gradient(15deg, #9da9ef, #5b6ace, #7483e4);
+            color: #0037a0;
+        }
+        .container {
+            padding: 2rem 2rem 300px 2rem;
+            margin: 0 auto 0 auto;
+            max-width: 800px;
+            position: relative;
+            overflow: hidden;
+        }
+        .row {
+            padding: 0.8rem 2rem;
+            font-family: 'Rubik', Arial, sans-serif;
+            line-height: 1.8rem;
+        }
+        .data-point {
+            display: flex;
+            text-align: left;
+            padding: 0.2rem 0;
+        }
+        .data-point-text {
+            font-size: 1.6rem;
+            font-weight: 200;
+            flex: 0 1 35%;
+            text-align: right;
+            padding-right: 1rem;
+            max-width: 18rem;
+        }
+        .data-point-value {
+            color: #225851;
+            font-size: 1.6rem;
+            align-self: center;
+            word-break: break-all;
+        }
+        .circuit-board {
+            position: absolute;
+            z-index: -1;
+            right: 0;
+            bottom: -100px;
+            width: 100%;
+            height: 400px;
+            pointer-events: none;
+        }
+        .circuit-board svg {
+            max-width: 400px;
+            position: absolute;
+            right: 0;
+        }
+        .circuit-board .overlay {
+            width: 100%;
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 2;
+        }
+        .flash-svg {
+            animation: pulse 2s infinite;
+        }
+        .flash-svg-2 {
+            animation: pulse 2s infinite;
+            animation-delay: 1s;
+        }
+        .flash-svg-3 {
+            animation: pulse 2s infinite;
+            animation-delay: 1.5s;
+        }
+        @keyframes pulse {
+            0% {
+                opacity: 0.2;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class='container'>
+        <h1>OHTI OSC WS Gateway</h1>
+
+        <div class='row'>
+            Many fancy words, Open Headtracking Initiative OSC gateway to websockets. In other words a simple headtracker IOT gateway/bridge, written in .NET Core.
+            It receives quaternion data from a headtracker device with OSC (Open Sound Control).
+            Messages are then relayed over a websocket connection.
+        </div>
+
+        <div class='row'>
+            The default setting is to listen to the broadcast address 255.255.255.255 on port 9000. Make the necessary adjustments in appsettings.json.
+            OSC data is received on this format:
+<pre>
+string address              float w     float x     float y     float z
+SceneRotator/quaternions    0.02314     0.45332     0.03412     0.42351
+</pre>
+            It's a console application that exposes a simple webpage and websocket with OSC data on localhost:5001 (that is also configurable).
+            Websockets is using SignalR and MessagePack as a functional layer on top.
+            The MessagePack addition is to optimize the transmission of data sent over the websocket.
+        </div>
+
+        <div class='row'>
+            It is working with some of the examples and implementations at <a href="https://ohti.xyz">OHTI.xyz</a>, where you can read more about ambisonics and quaternions.
+        </div>
+
+        <div class='row'>
+            Now that you have all the details, feel free to report <a href="https://github.com/Roog/OHTI-OSC-Receiver/issues">issues</a> or make <a href="https://github.com/Roog/OHTI-OSC-Receiver/pulls">pull requests</a> to the GitHub <a href="https://github.com/Roog/OHTI-OSC-Receiver">repository</a>.
+            The application is also available pre-compiled under <a href="https://github.com/Roog/OHTI-OSC-Receiver/releases">releases</a>, so it's alright to just grab a version from there.
+        </div>
+
+        <div class='row' id="download">
+
+        </div>
+
+        <h2>License</h2>
+
+        <div class='row'>
+            Copyright (c) 2021 Bo-Erik Sandholm & Roger Sandholm, Stockholm, Sweden.<br/>
+            The software is free :)
+            <br/><br/>
+            The OscCore is used to parse OSC messages and is provided by <a href="https://github.com/tilde-love/osc-core">tilde-love/osc-core</a> under the MIT License, <a href="https://github.com/tilde-love/osc-core/blob/master/LICENSE">LICENSE</a>.
+            <br/>
+            SignalR Protocol MessagePack is licensed under Apache-2.0, <a href="http://www.apache.org/licenses/LICENSE-2.0">LICENSE</a>.
+        </div>
+
+        <div class='circuit-board'>
+            <div class='overlay'> </div>
+            <svg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 140 140' enable-background='new 0 0 140 140' xml:space='preserve'>
+                <g>
+                    <path fill='#DD6460' d='M80.6,128.7L11.3,59.4c-2.3-2.3-2.3-6.1,0-8.5l39.6-39.6c2.3-2.3,6.1-2.3,8.5,0l69.3,69.3c2.3,2.3,2.3,6.1,0,8.5l-39.6,39.6C86.7,131,82.9,131,80.6,128.7z'/>
+                    <circle fill='#DD9B62' cx='120.2' cy='84.8' r='7'/>
+                    <circle fill='#DB7478' cx='120.2' cy='84.8' r='4.4'/>
+                    <circle fill='#DD9B62' cx='19.8' cy='55.2' r='7'/>
+                    <circle fill='#DB7478' cx='19.8' cy='55.2' r='4.4'/>
+                    <polyline class='flash-svg' fill='none' stroke='#DF6D6A' stroke-width='4' stroke-linecap='round' stroke-linejoin='round' stroke-miterlimit='10' points='71.3,43.3 71.4,30.4 58.4,17.4 50.6,25.1'/>
+                    <polyline class='flash-svg-2' fill='none' stroke='#DF6D6A' stroke-width='4' stroke-linecap='round' stroke-linejoin='round' stroke-miterlimit='10' points='86.9,118 81.9,122.9 57.6,98 57.3,82.2'/>
+                    <line fill='none' stroke='#DF6D6A' stroke-width='4' stroke-linecap='round' stroke-linejoin='round' stroke-miterlimit='10' x1='97' y1='107.6' x2='98.7' y2='88.1'/>
+                    <g>
+                        <path fill='#DD9B62' d='M86.3,52.3c1.1,0,2-0.9,2-2v0c0-1.1-0.9-2-2-2h-6v-6c0-1.1-0.9-2-2-2c-1.1,0-2,0.9-2,2v6h-3v-6c0-1.1-0.9-2-2-2s-2,0.9-2,2v6h-3v-6c0-1.1-0.9-2-2-2s-2,0.9-2,2v6h-3v-6c0-1.1-0.9-2-2-2s-2,0.9-2,2v6h-3v-6c0-1.1-0.9-2-2-2c-1.1,0-2,0.9-2,2v6h-6c-1.1,0-2,0.9-2,2v0c0,1.1,0.9,2,2,2h6v3h-6c-1.1,0-2,0.9-2,2c0,1.1,0.9,2,2,2h6v3h-6c-1.1,0-2,0.9-2,2c0,1.1,0.9,2,2,2h6v3h-6c-1.1,0-2,0.9-2,2s0.9,2,2,2h6v3h-6c-1.1,0-2,0.9-2,2s0.9,2,2,2h6v6c0,1.1,0.9,2,2,2c1.1,0,2-0.9,2-2v-6h3v6c0,1.1,0.9,2,2,2s2-0.9,2-2v-6h3v6c0,1.1,0.9,2,2,2s2-0.9,2-2v-6h3v6c0,1.1,0.9,2,2,2s2-0.9,2-2v-6h3v6c0,1.1,0.9,2,2,2c1.1,0,2-0.9,2-2v-6h6c1.1,0,2-0.9,2-2s-0.9-2-2-2h-6v-3h6c1.1,0,2-0.9,2-2s-0.9-2-2-2h-6v-3h6c1.1,0,2-0.9,2-2c0-1.1-0.9-2-2-2h-6v-3h6c1.1,0,2-0.9,2-2c0-1.1-0.9-2-2-2h-6v-3H86.3z'/>
+                        <path fill='#DE7F82' d='M82.3,84.3h-36c-1.1,0-2-0.9-2-2v-36c0-1.1,0.9-2,2-2h36c1.1,0,2,0.9,2,2v36C84.3,83.4,83.4,84.3,82.3,84.3z'/>
+                        <path fill='#E0888B' d='M61.3,64.3h-11c-0.6,0-1-0.4-1-1v-3c0-0.6,0.4-1,1-1h11c0.6,0,1,0.4,1,1v3C62.3,63.9,61.9,64.3,61.3,64.3z'/>
+                        <path fill='#E0888B' d='M66.3,54.3h-16c-0.6,0-1-0.4-1-1v-3c0-0.6,0.4-1,1-1h16c0.6,0,1,0.4,1,1v3C67.3,53.9,66.9,54.3,66.3,54.3z'/>
+                    </g>
+                    <g>
+                        <path fill='#DD9B62' d='M39.6,36.1L39.6,36.1c-0.8-0.8-0.8-2,0-2.8l12.7-12.7c0.8-0.8,2-0.8,2.8,0l0,0c0.8,0.8,0.8,2,0,2.8L42.5,36.1C41.7,36.9,40.4,36.9,39.6,36.1z'/>
+                        <path fill='#F0BCBB' d='M47,37.8L34.3,25.1c-0.8-0.8-0.8-2,0-2.8l7.1-7.1c0.8-0.8,2-0.8,2.8,0l12.7,12.7c0.8,0.8,0.8,2,0,2.8l-7.1,7.1C49.1,38.6,47.8,38.6,47,37.8z'/>
+                        <path fill='#FFE1E1' d='M46.9,34.1L44.7,32c-0.4-0.4-0.4-1,0-1.4l4.9-4.9c0.4-0.4,1-0.4,1.4,0l2.1,2.1c0.4,0.4,0.4,1,0,1.4l-4.9,4.9C47.9,34.5,47.2,34.5,46.9,34.1z'/>
+                    </g>
+                    <g>
+                        <path fill='#DD9B62' d='M85.3,119.3L85.3,119.3c-0.8-0.8-0.8-2,0-2.8l10.6-10.6c0.8-0.8,2-0.8,2.8,0h0c0.8,0.8,0.8,2,0,2.8l-10.6,10.6C87.4,120.1,86.1,120.1,85.3,119.3z'/>
+                        <path fill='#DE7F82' d='M89.8,118.1l-3.3-3.3c-0.8-0.8-0.8-2,0-2.8l4.9-4.9c0.8-0.8,2-0.8,2.8,0l3.3,3.3c0.8,0.8,0.8,2,0,2.8l-4.9,4.9C91.9,118.9,90.6,118.9,89.8,118.1z'/>
+                    </g>
+                    <g class='flash-svg-3'>
+                        <circle fill='#DD9A60' cx='98.7' cy='88.1' r='8.5'/>
+                        <circle fill='#EA7878' cx='98.7' cy='88.1' r='4.5'/>
+                    </g>
+                </g>
+            </svg>
+        </div>
+    </div>
+
+    <script type='text/javascript'>
+    'use strict';
+
+    fetch("https://api.github.com/repos/roog/OHTI-OSC-Receiver/releases/latest")
+        .then(response => response.json())
+        .then(data => {
+            if (data != null) {
+                let $root = document.getElementById("download");
+                console.log(data);
+                let title = `Release v${data.name} ${formatDateTime(data.published_at)}`;
+                let tmp = document.createElement("DIV");
+                tmp.textContent = title;
+                tmp.className = "release-title";
+
+                $root.append(tmp);
+
+                if (data.hasOwnProperty("assets") && data.assets.length != 0) {
+                    (data.assets || []).forEach((item) => {
+                        if (item.name.includes("tar.gz") || item.name.includes("zip")) {
+                            let rel = document.createElement("A");
+                            if (item.name.includes("win")) {
+                                rel.textContent = `Windows download`;
+                            } else if (item.name.includes("osx")) {
+                                rel.textContent = `OSX download`;
+                            } else if (item.name.includes("linux")) {
+                                rel.textContent = `Linux download`;
+                            } else {
+                                rel.textContent = item.name;
+                            }
+                            rel.href = item.browser_download_url || "#";
+                            rel.className = "download-link";
+                            $root.append(rel);
+                        }
+                    });
+                } else {
+                    let rel = document.createElement("A");
+                    rel.textContent = "Download";
+                    rel.href = "https://github.com/Roog/OHTI-OSC-Receiver/releases/latest";
+                    rel.className = "download-link";
+                    $root.append(rel);
+                }
+            } else {
+                console.log("GitHub responded with empty result, no release found")
+            }
+        });
+
+    function formatDateTime(incoming) {
+        let date = new Date(incoming);
+        let dd = (date.getDate() < 10 ? '0' : '') + date.getDate();
+        let MM = ((date.getMonth() + 1) < 10 ? '0' : '') + (date.getMonth() + 1);
+        let yyyy = date.getFullYear();
+
+        let hours = (date.getHours() < 10 ? '0' : '') + date.getHours();
+        let minutes = (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
+        // let seconds = (date.getSeconds() < 10 ? '0' : '') + date.getSeconds();
+
+        return (`${yyyy}-${MM}-${dd} ${hours}:${minutes}`);
+    }
+
+    </script>
+</body>
+</html>
