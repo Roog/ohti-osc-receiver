@@ -37,6 +37,9 @@ jobs:
     - name: Clean
       run: dotnet clean src/OHTI-OSC-Receiver/OHTI-OSC-Receiver.csproj --configuration Release && dotnet nuget locals all --clear
       
+    - name: Clean SLN
+      run: dotnet clean OHTI-OSC-Receiver.sln --configuration Release && dotnet nuget locals all --clear
+      
     - name: Build
       shell: bash
       run: |
