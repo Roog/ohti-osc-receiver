@@ -30,22 +30,19 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.101
-
+      
+    - name: Clean solution
+      run: dotnet clean OHTI-OSC-Receiver.sln --configuration Release && dotnet nuget locals all --clear
+      
     - name: Install dependencies
       run: dotnet restore
-      
-    - name: Clean
-      run: dotnet clean src/OHTI-OSC-Receiver/OHTI-OSC-Receiver.csproj --configuration Release && dotnet nuget locals all --clear
-      
-    - name: Clean SLN
-      run: dotnet clean OHTI-OSC-Receiver.sln --configuration Release && dotnet nuget locals all --clear
       
     - name: Build
       shell: bash
       run: |
         # Define some variables for things we need
         tag=$(git describe --tags --abbrev=0)
-        release_name="App-$tag-${{ matrix.target }}"
+        release_name="OHTI-OSC-Receiver-$tag-${{ matrix.target }}"
         # Build everything
         dotnet publish src/OHTI-OSC-Receiver/OHTI-OSC-Receiver.csproj --framework netcoreapp3.1 --runtime "${{ matrix.target }}" -c Release -o "$release_name" --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=true 
         # Pack files
@@ -60,7 +57,7 @@ jobs:
     - name: Publish
       uses: softprops/action-gh-release@v1
       with:
-        files: "App*"
+        files: "OHTI*"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
