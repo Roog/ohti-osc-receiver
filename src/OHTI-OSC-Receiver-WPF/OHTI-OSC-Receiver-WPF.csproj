@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <RootNamespace>OHTI_OSC_Receiver_WPF</RootNamespace>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
@@ -30,8 +30,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\lib\OpenSoundControlBroadcastClient\OpenSoundControlBroadcastClient.csproj" />
-    <ProjectReference Include="..\..\lib\OpenSoundControlClient\OpenSoundControlClient.csproj" />
+    <ProjectReference Include="..\..\lib\OpenSoundControlBroadcastClient\OpenSoundControlBroadcastClient.csproj">
+      <ReferenceSourceTarget></ReferenceSourceTarget>
+    </ProjectReference>
+    <ProjectReference Include="..\..\lib\OpenSoundControlClient\OpenSoundControlClient.csproj">
+      <ReferenceSourceTarget></ReferenceSourceTarget>
+    </ProjectReference>
   </ItemGroup>
 
 </Project>
