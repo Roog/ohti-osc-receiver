@@ -44,7 +44,7 @@ jobs:
                   tag=$(git describe --tags --abbrev=0)
                   release_name="OHTI-OSC-Receiver-$tag-${{ matrix.target }}"
                   # Build everything
-                  dotnet publish src/OHTI-OSC-Receiver/OHTI-OSC-Receiver.csproj --framework netcoreapp3.1 --runtime "${{ matrix.target }}" -c Release -o "$release_name" --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=true 
+                  dotnet publish src/OHTI-OSC-Receiver/OHTI-OSC-Receiver.csproj --framework net7.0* --runtime "${{ matrix.target }}" -c Release -o "$release_name" --self-contained true -p:PublishSingleFile=true -p:PublishTrimmed=true 
                   # Pack files
                   if [ "${{ matrix.target }}" == "win-x64" ]; then
                     7z a -tzip "${release_name}.zip" "./${release_name}/*"
