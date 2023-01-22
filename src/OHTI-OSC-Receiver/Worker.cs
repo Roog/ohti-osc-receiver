@@ -81,7 +81,7 @@ namespace OHTI_OSC_Receiver
             while (!stoppingToken.IsCancellationRequested)
             {
                 _logger.LogInformation($"Worker running at: {DateTimeOffset.Now}, current headtracking data: {_headtrackerData}");
-                SendApplicationStateAsync();
+                await SendApplicationStateAsync();
                 await Task.Delay(2000, stoppingToken);
             }
         }

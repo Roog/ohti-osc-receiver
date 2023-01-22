@@ -158,7 +158,7 @@ namespace OpenSoundControlBroadcastClient
             {
                 bytes = udpClient.EndReceive(result, ref remoteIpEndpoint);
             }
-            catch (ObjectDisposedException e)
+            catch //(ObjectDisposedException ex)
             {
                 // Ignore if disposed. This happens when closing the listener
             }

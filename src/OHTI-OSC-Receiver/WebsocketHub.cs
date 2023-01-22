@@ -49,7 +49,7 @@ namespace OHTI_OSC_Receiver
         {
             await Clients.All.ApplicationSettings(_configuration);
 
-            worker.SendApplicationStateAsync();
+            await worker.SendApplicationStateAsync();
         }
 
         public override Task OnDisconnectedAsync(Exception exception)
