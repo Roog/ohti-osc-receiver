@@ -29,7 +29,7 @@ jobs:
             - name: Setup .NET Core
               uses: actions/setup-dotnet@v1
               with:
-                  dotnet-version: 7.0.2 #3.1.101
+                  dotnet-version: 7.x #3.1.101
 
             - name: Clean solution
               run: dotnet clean OHTI-OSC-Receiver.sln --configuration Release && dotnet nuget locals all --clear
