@@ -1,10 +1,10 @@
-﻿{
-  "profiles": {
-    "OHTI_OSC_Receiver": {
-      "commandName": "Project",
-      "environmentVariables": {
-        "DOTNET_ENVIRONMENT": "Development"
-      }
+{
+    "profiles": {
+        "OHTI_OSC_Receiver": {
+            "commandName": "Project",
+            "environmentVariables": {
+                "DOTNET_ENVIRONMENT": "Development"
+            }
+        }
     }
-  }
 }

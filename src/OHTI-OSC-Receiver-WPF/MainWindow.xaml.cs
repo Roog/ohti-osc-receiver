@@ -69,10 +69,12 @@ namespace OHTI_OSC_Receiver_WPF
 
             _oscListener.HeadtrackingDataEvent += (string address, float x, float y, float z, float theta) =>
             {
-                try {
+                try
+                {
                     string mess = $"{address} {x}, {y}, {z}, {theta}".ToString();
                     AddConsoleRow(mess);
-                } catch(Exception ex)
+                }
+                catch (Exception ex)
                 {
                     Console.WriteLine(ex);
                 }
@@ -132,7 +134,7 @@ namespace OHTI_OSC_Receiver_WPF
             {
                 TextConsole.Text = "> " + text; // + Environment.NewLine + TextConsole.Text;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex);
                 TextConsole.Text = "...";

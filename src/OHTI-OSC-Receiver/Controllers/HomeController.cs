@@ -34,7 +34,7 @@ using OHTI_OSC_Receiver.Helpers;
 
 namespace OHTI_OSC_Receiver.Controllers
 {
-    public class HomeController: Controller
+    public class HomeController : Controller
     {
         [HttpGet]
         [Route("~/", Name = "default")]

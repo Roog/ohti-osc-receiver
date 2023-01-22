@@ -39,7 +39,7 @@ using OscCore;
 
 namespace OpenSoundControlBroadcastClient
 {
-    public class UdpBroadcastReceiver: IDisposable
+    public class UdpBroadcastReceiver : IDisposable
     {
         private readonly ILogger<UdpBroadcastReceiver> _logger;
 
@@ -84,7 +84,7 @@ namespace OpenSoundControlBroadcastClient
                 udpClient.Close();
                 udpClient = null;
             }
-            
+
             while (udpClient == null && stoppingTokenSource.Token.IsCancellationRequested == false)
             {
                 try
@@ -140,7 +140,7 @@ namespace OpenSoundControlBroadcastClient
                 udpClient.Send(data, data.Length, options.Hostname, options.Port);
                 _logger.LogDebug("UdpClient keep alive package sent");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogWarning($"UdpClient could not send keep alive package because: {ex.Message}");
             }

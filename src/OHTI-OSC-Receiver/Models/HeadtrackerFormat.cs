@@ -70,9 +70,12 @@ namespace OHTI_OSC_Receiver.Models
 
             // pitch (y-axis rotation)
             var sinp = 2 * (W * Y - Z * X);
-            if (Math.Abs(sinp) >= 1) {
+            if (Math.Abs(sinp) >= 1)
+            {
                 Pitch = ((Math.PI / 2) * Math.Sign(sinp)); // use 90 degrees if out of range, copysign = sinp + or - applied to Math.PI/2
-            } else {
+            }
+            else
+            {
                 Pitch = (Math.Asin(sinp));
             }
 

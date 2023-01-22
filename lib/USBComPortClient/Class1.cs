@@ -40,10 +40,10 @@ namespace USBComPortClient
         static bool _continue;
         static SerialPort _serialPort;
 
-        // Get a list of serial port names.             
+        // Get a list of serial port names.
         //string[] ports = SerialPort.GetPortNames();
         //Console.WriteLine("The following serial ports were found:");
-        //// Display each port name to the console.             
+        //// Display each port name to the console.
         //foreach (string port in ports)
         //{
         //    Console.WriteLine(port);
